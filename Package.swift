@@ -20,7 +20,10 @@ let package = Package(
       targets: [
         "gRPC-cpp",
       ]
-    )
+    ),
+    .library(name: "gRPC-RxLibrary", targets: ["gRPC-RxLibrary"]),
+    .library(name: "gRPC", targets: ["gRPC"]),
+    .library(name: "gRPC-ProtoRPC", targets: ["gRPC-ProtoRPC"]),
   ],
 
   dependencies: [
@@ -100,6 +103,81 @@ let package = Package(
         .headerSearchPath("third_party/upb/"),
         .headerSearchPath("src/core/ext/upb-gen"),
         .headerSearchPath("src/core/ext/upbdefs-gen/"),
+      ]
+    ),
+    .target(
+      name: "gRPC-RxLibrary",
+      dependencies: [],
+      path: basePath,
+      exclude: [
+        "src/objective-c/RxLibrary/README.md",
+        "tests",
+      ],
+      sources: [
+        "src/objective-c/RxLibrary",
+      ],
+      resources: [
+        .copy("src/objective-c/PrivacyInfo.xcprivacy"),
+      ],
+      publicHeadersPath: "spm-rxlibrary-include",
+      cSettings: [
+        .headerSearchPath("./"),
+        .headerSearchPath("src/objective-c/RxLibrary"),
+      ]
+    ),
+    .target(
+      name: "gRPC",
+      dependencies: [
+        "gRPC-Core",
+        "gRPC-RxLibrary",
+      ],
+      path: basePath,
+      exclude: [
+        "src/objective-c/GRPCClient/GRPCCall+GID.h",
+        "src/objective-c/GRPCClient/GRPCCall+GID.mm",
+        "src/objective-c/GRPCClient/README.md",
+        "tests",
+      ],
+      sources: [
+        "src/objective-c/GRPCClient",
+      ],
+      resources: [
+        .copy("src/objective-c/PrivacyInfo.xcprivacy"),
+        .copy("etc/roots.pem"),
+      ],
+      publicHeadersPath: "spm-grpcclient-include",
+      cSettings: [
+        .headerSearchPath("./"),
+        .headerSearchPath("include/"),
+        .headerSearchPath("src/objective-c/"),
+        .headerSearchPath("src/objective-c/GRPCClient"),
+        .headerSearchPath("src/objective-c/GRPCClient/private/GRPCCore"),
+        .headerSearchPath("src/objective-c/RxLibrary"),
+      ]
+    ),
+    .target(
+      name: "gRPC-ProtoRPC",
+      dependencies: [
+        "gRPC",
+        "gRPC-RxLibrary",
+      ],
+      path: basePath,
+      exclude: [
+        "tests",
+      ],
+      sources: [
+        "src/objective-c/ProtoRPC",
+      ],
+      resources: [
+        .copy("src/objective-c/PrivacyInfo.xcprivacy"),
+      ],
+      publicHeadersPath: "spm-protorpc-include",
+      cSettings: [
+        .headerSearchPath("./"),
+        .headerSearchPath("src/objective-c/"),
+        .headerSearchPath("src/objective-c/ProtoRPC"),
+        .headerSearchPath("src/objective-c/GRPCClient"),
+        .headerSearchPath("src/objective-c/RxLibrary"),
       ]
     ),
     .testTarget(
